@@ -20,7 +20,6 @@ class User:
     name:str
     lw:int
 
-
 def init_dbs():
     global curs_word, curs_results
     global db_word, db_result
@@ -76,17 +75,36 @@ def load_results():
     data = curs_results.fetchone()
     # print(data[0], data[1])
 
+def check_and_rm_suffix(w:str)->(str, str):
+    FLAGS=('/',)
+    flag = None
+    if w.endswith(FLAGS):
+        flag = w[-1]
+        w = w.rstrip(flag)
+    return w, flag
+
+
+
 def select_next(i:int):
     # print('3: select_next')
     #get word
     curs_word.execute("SELECT * FROM lemmas WHERE  lemmas.rank == ? ;", (i,))
     data = curs_word.fetchone()
-    word = data[1]
+    word = data[1].strip()
     try:
         trans = e_r_dict[word]
     except KeyError:
         trans = '~'
-    print(f'{data[2]} {word} {trans}')
+
+    answ = input(f'{data[2]} {trans}: ').strip()
+    answ, flag = check_and_rm_suffix(answ)
+
+    print(answ, flag)
+    if answ == word:
+        print('Correct!')
+    else:
+        print(f"Incorrect! True word is '{word}'")
+    # print(f'{data[2]} {word} {trans}')
 
 
 if __name__ == '__main__':
