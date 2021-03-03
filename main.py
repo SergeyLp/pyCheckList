@@ -1,5 +1,6 @@
 import os#,sys#, datetime
 import sqlite3 as sql
+from datetime import datetime
 from time import time
 from typing import List, Tuple
 from pystardict import Dictionary
@@ -28,7 +29,7 @@ def init_dbs():
     db_word = sql.connect(DB_FILE_PATH, timeout=1)
     curs_word = db_word.cursor()
 
-    db_result = sql.connect(DB_RESULT_PATH, timeout=1)
+    db_result = sql.connect(DB_RESULT_PATH, timeout=1)  #, detect_types=sql.PARSE_DECLTYPES
     curs_results = db_result.cursor()
 
 def finish():
@@ -89,6 +90,7 @@ def select_next(i:int):
     #get word
     curs_word.execute("SELECT * FROM lemmas WHERE  lemmas.rank == ? ;", (i,))
     data = curs_word.fetchone()
+    lex_id = data[0]
     word = data[1].strip()
     try:
         trans = e_r_dict[word]
@@ -97,13 +99,21 @@ def select_next(i:int):
 
     t0 = time()
     answ = input(f'{data[2]} {trans}: ').strip()
-    times[word]= (time() - t0)/len(answ)
+    answ_time = (time() - t0)/len(answ)
+    times[word]= answ_time
 
     answ, flag = check_and_rm_suffix(answ)
     # if flag: print(answ, flag)
 
     if answ != word:
         print(f"Incorrect! True word is '{word}'")
+
+    curs_results.execute("INSERT INTO Answers VALUES(?, 1, ?, 3, ?)",
+                         (datetime.now(), lex_id, answ_time))
+
+    db_result.commit()
+
+    # data = curs_results.fetchone()
 
     return flag
 
