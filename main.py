@@ -13,6 +13,7 @@ db_result = None
 curs_word = None
 curs_results = None
 e_r_dict = None
+times= dict()
 
 #@dataclass
 class User:
@@ -77,11 +78,11 @@ def load_results():
 
 def check_and_rm_suffix(w:str)->(str, str):
     FLAGS=('/','!')
-    flag = None
+    flag_ = None
     if w.endswith(FLAGS):
-        flag = w[-1]
-        w = w.rstrip(flag)
-    return w, flag
+        flag_ = w[-1]
+        w = w.rstrip(flag_)
+    return w, flag_
 
 def select_next(i:int):
     # print('3: select_next')
@@ -92,18 +93,19 @@ def select_next(i:int):
     try:
         trans = e_r_dict[word]
     except KeyError:
-        trans = '~'
+        trans = f'@{word}'
 
+    t0 = time()
     answ = input(f'{data[2]} {trans}: ').strip()
-    answ, flag = check_and_rm_suffix(answ)
+    times[word]= (time() - t0)/len(answ)
 
-    if flag: print(answ, flag)
+    answ, flag = check_and_rm_suffix(answ)
+    # if flag: print(answ, flag)
 
     if answ != word:
         print(f"Incorrect! True word is '{word}'")
 
     return flag
-    # print(f'{data[2]} {word} {trans}')
 
 
 if __name__ == '__main__':
@@ -113,9 +115,15 @@ if __name__ == '__main__':
     init_dicts()
     load_results()
     print(f'Time: {time() - start_time}')
+    print('''Suffixes:
+        / don\'t add,
+        ! exit''')
     for i in range(1, 20000):
         flag = select_next(i)
         if flag == '!': break
+
+    for w,t in times.items():
+        print(w, t)
     # print('\n---')
     # print('4: show_translated')
     # print('5: check')
