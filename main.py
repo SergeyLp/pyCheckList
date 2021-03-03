@@ -75,7 +75,8 @@ def load_results():
     # print('2: load_results')
     curs_results.execute("SELECT name, last_word from Users WHERE id=?", (1,))
     data = curs_results.fetchone()
-    # print(data[0], data[1])
+    print(data[0], data[1])
+
 
 def check_and_rm_suffix(w:str)->(str, str):
     FLAGS=('/','!')
@@ -105,10 +106,12 @@ def select_next(i:int):
     answ, flag = check_and_rm_suffix(answ)
     # if flag: print(answ, flag)
 
+    if flag == '!' and len(answ) <= 1: return flag
+
     if answ != word:
         print(f"Incorrect! True word is '{word}'")
 
-    curs_results.execute("INSERT INTO Answers VALUES(?, 1, ?, 3, ?)",
+    curs_results.execute("INSERT INTO Answers VALUES(julianday(?), 1, ?, 3, ?)",
                          (datetime.now(), lex_id, answ_time))
 
     db_result.commit()
