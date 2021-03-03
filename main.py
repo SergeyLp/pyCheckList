@@ -5,7 +5,7 @@ from time import time
 from typing import List, Tuple
 from pystardict import Dictionary
 from lyp_util import load_or_execute
-from config import IN_FILE_PATH, DB_FILE_PATH, DB_RESULT_PATH
+from config import DB_FILE_PATH, DB_RESULT_PATH, STARDICT_DIR, STARDICT_NAME #IN_FILE_PATH,
 
 start_time = time()
 
@@ -37,11 +37,8 @@ def finish():
     db_result.close()
 
 def init_dicts():
-    # os.path.join(os.path.dirname())
-    dicts_dir = r"D:\_Data\Dict\StarDict"
     global e_r_dict
-    e_r_dict = Dictionary(os.path.join(dicts_dir, 'stardict-quick_eng-rus-2.4.2',
-                                          'quick_english-russian'))
+    e_r_dict = Dictionary(os.path.join(STARDICT_DIR, STARDICT_NAME))
     # quick_ru2en = Dictionary(os.path.join(dicts_dir, 'stardict-quick_rus-eng-2.4.2',
     #                                       'quick_russian-english'))
     # apresyan = Dictionary(os.path.join(dicts_dir, 'Apresyan',
