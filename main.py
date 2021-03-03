@@ -71,11 +71,16 @@ def load_word_db():
         # else:
         #     w_id = data[0][0]
 
-def load_results():
+def load_results()->int:
     # print('2: load_results')
     curs_results.execute("SELECT name, last_word from Users WHERE id=?", (1,))
     data = curs_results.fetchone()
     print(data[0], data[1])
+    curs_results.execute("SELECT MAX(lex_id) from Answers WHERE user_id=?", (1,))   #, last_word from Users
+    data = curs_results.fetchone()
+    last_lexem= data[0]
+    print(last_lexem)
+    return last_lexem
 
 
 def check_and_rm_suffix(w:str)->(str, str):
@@ -100,6 +105,7 @@ def select_next(i:int):
 
     t0 = time()
     answ = input(f'{data[2]} {trans}: ').strip()
+    if len(answ) <= 1: return '!'
     answ_time = (time() - t0)/len(answ)
     times[word]= answ_time
 
@@ -111,13 +117,10 @@ def select_next(i:int):
     if answ != word:
         print(f"Incorrect! True word is '{word}'")
 
-    curs_results.execute("INSERT INTO Answers VALUES(julianday(?), 1, ?, 3, ?)",
+    curs_results.execute("INSERT INTO Answers VALUES(julianday(?), 1, ?, 3, 5.0, ?)",
                          (datetime.now(), lex_id, answ_time))
 
     db_result.commit()
-
-    # data = curs_results.fetchone()
-
     return flag
 
 
@@ -126,12 +129,12 @@ if __name__ == '__main__':
     # load_word_db()
     init_dbs()
     init_dicts()
-    load_results()
+    last_lexem = load_results()
     print(f'Time: {time() - start_time}')
     print('''Suffixes:
         / don\'t add,
         ! exit''')
-    for i in range(1, 20000):
+    for i in range(last_lexem+1, 20000):
         flag = select_next(i)
         if flag == '!': break
 
