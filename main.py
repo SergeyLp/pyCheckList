@@ -76,14 +76,12 @@ def load_results():
     # print(data[0], data[1])
 
 def check_and_rm_suffix(w:str)->(str, str):
-    FLAGS=('/',)
+    FLAGS=('/','!')
     flag = None
     if w.endswith(FLAGS):
         flag = w[-1]
         w = w.rstrip(flag)
     return w, flag
-
-
 
 def select_next(i:int):
     # print('3: select_next')
@@ -99,11 +97,12 @@ def select_next(i:int):
     answ = input(f'{data[2]} {trans}: ').strip()
     answ, flag = check_and_rm_suffix(answ)
 
-    print(answ, flag)
-    if answ == word:
-        print('Correct!')
-    else:
+    if flag: print(answ, flag)
+
+    if answ != word:
         print(f"Incorrect! True word is '{word}'")
+
+    return flag
     # print(f'{data[2]} {word} {trans}')
 
 
@@ -113,11 +112,13 @@ if __name__ == '__main__':
     init_dbs()
     init_dicts()
     load_results()
-    select_next(9)
+    print(f'Time: {time() - start_time}')
+    for i in range(1, 20000):
+        flag = select_next(i)
+        if flag == '!': break
     # print('\n---')
     # print('4: show_translated')
     # print('5: check')
     # print('6: save_results')
     # print('7: goto <3>')
     finish()
-    print(f'Time: {time() - start_time}')
